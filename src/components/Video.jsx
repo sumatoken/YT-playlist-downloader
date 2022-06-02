@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 
 export default function Video({ title, videoId, thumbnail }) {
-  const [selected, setSelected] = useState([]);
+  const [checked, setChecked] = useState(false);
   const handleCheckBox = (video) => {
-    console.log(video);
+    setChecked(!checked);
   };
   return (
     <div>
@@ -16,6 +16,7 @@ export default function Video({ title, videoId, thumbnail }) {
               type="checkbox"
               className="form-check-input"
               id="exampleCheck1"
+              checked={checked}
               onChange={handleCheckBox(videoId)}
             />
             <label className="form-check-label">Select</label>
