@@ -6,6 +6,7 @@ export default function Video({ title, videoId, thumbnail, checked }) {
       <div className="card">
         <img className="card-img-top" src={thumbnail} alt="Card image cap" />
         <div className="card-body">
+          <input type="hidden" value={checked} />
           <h5 className="card-title">{title}</h5>
           <div className="form-check">
             <label className="form-check-label">Select</label>

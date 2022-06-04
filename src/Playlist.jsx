@@ -6,7 +6,7 @@ export default function Playlist() {
   const KEY = process.env.REACT_APP_KEY;
   const [items, setItems] = useState([]);
   const [selected, setSelected] = useState([]);
-  /* useEffect(() => {
+  useEffect(() => {
     fetch(
       "https://youtube.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=PLc_afqBp7xRGyCYx9vXkHkSz9oOor-iar&key=" +
         KEY
@@ -15,8 +15,8 @@ export default function Playlist() {
       .then((json) => {
         setItems(json.items);
       });
-  }, [items]); */
-  const itemss = [
+  }, []);
+  /*  const itemss = [
     {
       id: 1,
       title: "First",
@@ -32,7 +32,7 @@ export default function Playlist() {
       title: "Third",
       thumbnail: "https://picsum.photos/200/200",
     },
-  ];
+  ]; */
 
   const handleCheck = (video) => {
     if (selected.includes(video)) {
@@ -54,27 +54,26 @@ export default function Playlist() {
     <>
       <Link to="/">Home</Link>
       <div className="row">
-        {itemss.map((item, i) => (
+        {items.map((item, i) => (
           <div
             key={i}
             className="col-4"
             onClick={(e) => {
-              handleCheck(item.id);
+              handleCheck(item.snippet.resourceId.videoId);
             }}
           >
-            {/*  <Video
+            <Video
               key={i}
               title={item.snippet.title}
               videoId={item.snippet.resourceId.videoId}
               thumbnail={item.snippet.thumbnails.high.url}
-            /> */}
-            <Video
+            />
+            {/*  <Video
               key={i}
               title={item.title}
               videoId={item.videoId}
               thumbnail={item.thumbnail}
-              checked={selected.includes(item.videoId) ? true : false}
-            />
+            /> */}
           </div>
         ))}
       </div>
