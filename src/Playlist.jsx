@@ -33,16 +33,35 @@ export default function Playlist() {
       thumbnail: "https://picsum.photos/200/200",
     },
   ];
+
   const handleCheck = (video) => {
-    console.log(5);
-    console.log(video);
+    if (selected.includes(video)) {
+      setSelected(selected.filter((v) => v !== video));
+      console.log("removed " + video);
+    } else {
+      setSelected([...selected, video]);
+      console.log("added " + video);
+      console.log(selected);
+    }
+
+    setSelected((s) => {
+      console.log(s);
+      return s;
+    });
   };
+
   return (
     <>
       <Link to="/">Home</Link>
       <div className="row">
         {itemss.map((item, i) => (
-          <div key={i} className="col-4">
+          <div
+            key={i}
+            className="col-4"
+            onClick={(e) => {
+              handleCheck(item.id);
+            }}
+          >
             {/*  <Video
               key={i}
               title={item.snippet.title}
@@ -54,7 +73,7 @@ export default function Playlist() {
               title={item.title}
               videoId={item.videoId}
               thumbnail={item.thumbnail}
-              onClick={handleCheck(item.id)}
+              checked={selected.includes(item.videoId) ? true : false}
             />
           </div>
         ))}

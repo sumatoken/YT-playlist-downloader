@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-export default function Video({ title, videoId, thumbnail }) {
+export default function Video({ title, videoId, thumbnail, checked }) {
   return (
     <div>
       <div className="card">
