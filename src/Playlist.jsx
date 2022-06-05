@@ -49,10 +49,26 @@ export default function Playlist() {
       return s;
     });
   };
-
+  const handleSelectAll = () => {
+    items.map((item, i) =>
+      !selected.includes(item.snippet.resourceId.videoId)
+        ? selected.push(item.snippet.resourceId.videoId)
+        : console.log("Item exists " + item.snippet.resourceId.videoId)
+    );
+    console.log(selected);
+  };
   return (
     <>
       <Link to="/">Home</Link>
+      <button
+        type="button"
+        className="btn btn-outline-primary"
+        onClick={() => {
+          handleSelectAll();
+        }}
+      >
+        Select All
+      </button>
       <div className="row">
         {items.map((item, i) => (
           <div
