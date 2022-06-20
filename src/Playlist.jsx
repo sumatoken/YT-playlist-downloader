@@ -1,21 +1,28 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Video from "./components/Video";
-
+import ReactPaginate from "react-paginate";
+import FetchPlaylist from "./services/FetchPlaylist";
 export default function Playlist() {
   const KEY = process.env.REACT_APP_KEY;
+  const [isLoaded, setIsLoaded] = useState(0);
   const [items, setItems] = useState([]);
+  const [response, setResponse] = useState([]);
   const [selected, setSelected] = useState([]);
-  useEffect(() => {
-    fetch(
-      "https://youtube.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=PLc_afqBp7xRGyCYx9vXkHkSz9oOor-iar&key=" +
-        KEY
-    )
-      .then((res) => res.json())
-      .then((json) => {
-        setItems(json.items);
-      });
-  }, []);
+  const [pageToken, setPageToken] = useState("");
+  const [nextPageToken, setNextPageToken] = useState("");
+  const [totalPages, setTotalPages] = useState(0);
+  const handleFetch = (nextPageToken = "") => {
+    FetchPlaylist(KEY, nextPageToken)
+      .then((res) => {
+        setIsLoaded(1);
+        setItems(res.items);
+        console.log(res);
+        setTotalPages(res.pageInfo.totalResults / 50);
+        setNextPageToken(res.nextPageToken);
+      })
+      .catch((err) => console.log(err));
+  };
   /*  const itemss = [
     {
       id: 1,
@@ -63,11 +70,27 @@ export default function Playlist() {
       <button
         type="button"
         className="btn btn-outline-primary"
+        onClick={() => handleFetch()}
+      >
+        Fetch playlist
+      </button>
+      <button
+        type="button"
+        className="btn btn-outline-primary"
         onClick={() => {
           handleSelectAll();
         }}
       >
         Select All
+      </button>
+      <button
+        type="button"
+        className="btn btn-outline-primary"
+        onClick={() => {
+          setSelected([]);
+        }}
+      >
+        Clear
       </button>
       <div className="row">
         {items.map((item, i) => (
@@ -94,6 +117,25 @@ export default function Playlist() {
         ))}
       </div>
       <br />
+      {isLoaded ? (
+        <ReactPaginate
+          pageCount={Math.ceil(totalPages)}
+          pageRange={2}
+          marginPagesDisplayed={2}
+          onPageChange={(e) => {
+            handleFetch(nextPageToken);
+          }}
+          containerClassName={"pagination_container"}
+          previousLinkClassName={"page"}
+          breakClassName={"page"}
+          nextLinkClassName={"page"}
+          pageClassName={"page"}
+          disabledClassNae={"disabled"}
+          activeClassName={"active"}
+        />
+      ) : (
+        <div>Nothing to show</div>
+      )}
       <button type="button" className="btn btn-outline-primary">
         Download
       </button>
