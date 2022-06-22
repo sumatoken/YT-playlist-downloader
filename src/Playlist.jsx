@@ -6,9 +6,7 @@ import FetchPlaylist from "./services/FetchPlaylist";
 import async from "async";
 import PlaylistItems from "./components/PlaylistItems";
 export default function Playlist() {
-  const KEY = process.env.REACT_APP_KEY;
   const [isLoaded, setIsLoaded] = useState(0);
-  const [items, setItems] = useState([]);
   const [response, setResponse] = useState([]);
   const [selected, setSelected] = useState([]);
   const [pageNumber, setPageNumber] = useState(null);
@@ -16,8 +14,11 @@ export default function Playlist() {
   const [totalPages, setTotalPages] = useState(0);
   const [isLoading, setIsLoading] = useState(0);
   const [completed, setCompleted] = useState(0);
+  const [items, setItems] = useState([]);
 
   useEffect(() => {
+    const KEY = process.env.REACT_APP_KEY;
+
     if (isLoading) {
       FetchPlaylist(KEY, nextPageToken).then((res) => {
         setIsLoaded(1);
@@ -25,11 +26,14 @@ export default function Playlist() {
         res.nextPageToken
           ? setNextPageToken(res.nextPageToken)
           : setCompleted(1);
-        setItems([...items, res.items]);
+        setItems((items) => {
+          setItems([...items, res.items]);
+        });
       });
     }
   }, [isLoading, nextPageToken]);
 
+  console.log(items);
   /*  const itemss = [
     {
       id: 1,
@@ -47,14 +51,15 @@ export default function Playlist() {
       thumbnail: "https://picsum.photos/200/200",
     },
   ]; */
-
-  /*  const handleCheck = (video) => {
-    if (selected.includes(video)) {
-      setSelected(selected.filter((v) => v !== video));
-      console.log("removed " + video);
+  const handleCheck = (item) => {
+    if (selected.includes(item.snippet.resourceId.videoId)) {
+      setSelected(
+        selected.filter((v) => v !== item.snippet.resourceId.videoId)
+      );
+      console.log("removed " + item.snippet.title);
     } else {
-      setSelected([...selected, video]);
-      console.log("added " + video);
+      setSelected([...selected, item.snippet.resourceId.videoId]);
+      console.log("added " + item.snippet.title);
       console.log(selected);
     }
 
@@ -63,14 +68,13 @@ export default function Playlist() {
       return s;
     });
   };
+
   const handleSelectAll = () => {
-    items.map((item, i) =>
-      !selected.includes(item.snippet.resourceId.videoId)
-        ? selected.push(item.snippet.resourceId.videoId)
-        : console.log("Item exists " + item.snippet.resourceId.videoId)
+    items.map((pack, i) =>
+      pack.map((item, k) => selected.push(item.snippet.resourceId.videoId))
     );
     console.log(selected);
-  }; */
+  };
   return (
     <>
       <Link to="/">Home</Link>
@@ -81,7 +85,7 @@ export default function Playlist() {
       >
         Fetch playlist
       </button>
-      {/*      <button
+      <button
         type="button"
         className="btn btn-outline-primary"
         onClick={() => {
@@ -98,11 +102,12 @@ export default function Playlist() {
         }}
       >
         Clear
-      </button> */}
+      </button>
       <br />
       {completed ? (
         <>
-          <PlaylistItems items={items} />
+          <PlaylistItems items={items} handleCheck={handleCheck} />
+
           <ReactPaginate
             pageCount={Math.ceil(totalPages)}
             pageRange={2}

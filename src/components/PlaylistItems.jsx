@@ -1,6 +1,6 @@
 import React from "react";
 import Video from "./Video";
-function getThumbnail(item) {
+const getThumbnail = (item) => {
   if (item.snippet.thumbnails.high) {
     console.log("high");
     return item.snippet.thumbnails.high.url;
@@ -10,8 +10,9 @@ function getThumbnail(item) {
   } else {
     return "no thumbnail";
   }
-}
-export default function PlaylistItems({ items }) {
+};
+
+export default function PlaylistItems({ items, handleCheck }) {
   return (
     <div className="row">
       {items.map((item, i) =>
@@ -20,7 +21,7 @@ export default function PlaylistItems({ items }) {
             key={k}
             className="col-4"
             onClick={(e) => {
-              //handleCheck(item.snippet.resourceId.videoId);
+              handleCheck(it);
               console.log(e);
             }}
           >
