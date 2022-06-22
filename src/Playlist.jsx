@@ -3,26 +3,33 @@ import { Link } from "react-router-dom";
 import Video from "./components/Video";
 import ReactPaginate from "react-paginate";
 import FetchPlaylist from "./services/FetchPlaylist";
+import async from "async";
+import PlaylistItems from "./components/PlaylistItems";
 export default function Playlist() {
   const KEY = process.env.REACT_APP_KEY;
   const [isLoaded, setIsLoaded] = useState(0);
   const [items, setItems] = useState([]);
   const [response, setResponse] = useState([]);
   const [selected, setSelected] = useState([]);
-  const [pageToken, setPageToken] = useState("");
+  const [pageNumber, setPageNumber] = useState(null);
   const [nextPageToken, setNextPageToken] = useState("");
   const [totalPages, setTotalPages] = useState(0);
-  const handleFetch = (nextPageToken = "") => {
-    FetchPlaylist(KEY, nextPageToken)
-      .then((res) => {
+  const [isLoading, setIsLoading] = useState(0);
+  const [completed, setCompleted] = useState(0);
+
+  useEffect(() => {
+    if (isLoading) {
+      FetchPlaylist(KEY, nextPageToken).then((res) => {
         setIsLoaded(1);
-        setItems(res.items);
-        console.log(res);
-        setTotalPages(res.pageInfo.totalResults / 50);
-        setNextPageToken(res.nextPageToken);
-      })
-      .catch((err) => console.log(err));
-  };
+        setTotalPages(Math.ceil(res.pageInfo.totalResults / 50));
+        res.nextPageToken
+          ? setNextPageToken(res.nextPageToken)
+          : setCompleted(1);
+        setItems([...items, res.items]);
+      });
+    }
+  }, [isLoading, nextPageToken]);
+
   /*  const itemss = [
     {
       id: 1,
@@ -41,7 +48,7 @@ export default function Playlist() {
     },
   ]; */
 
-  const handleCheck = (video) => {
+  /*  const handleCheck = (video) => {
     if (selected.includes(video)) {
       setSelected(selected.filter((v) => v !== video));
       console.log("removed " + video);
@@ -63,18 +70,18 @@ export default function Playlist() {
         : console.log("Item exists " + item.snippet.resourceId.videoId)
     );
     console.log(selected);
-  };
+  }; */
   return (
     <>
       <Link to="/">Home</Link>
       <button
         type="button"
         className="btn btn-outline-primary"
-        onClick={() => handleFetch()}
+        onClick={() => setIsLoading(1)}
       >
         Fetch playlist
       </button>
-      <button
+      {/*      <button
         type="button"
         className="btn btn-outline-primary"
         onClick={() => {
@@ -91,48 +98,27 @@ export default function Playlist() {
         }}
       >
         Clear
-      </button>
-      <div className="row">
-        {items.map((item, i) => (
-          <div
-            key={i}
-            className="col-4"
-            onClick={(e) => {
-              handleCheck(item.snippet.resourceId.videoId);
-            }}
-          >
-            <Video
-              key={i}
-              title={item.snippet.title}
-              videoId={item.snippet.resourceId.videoId}
-              thumbnail={item.snippet.thumbnails.high.url}
-            />
-            {/*  <Video
-              key={i}
-              title={item.title}
-              videoId={item.videoId}
-              thumbnail={item.thumbnail}
-            /> */}
-          </div>
-        ))}
-      </div>
+      </button> */}
       <br />
-      {isLoaded ? (
-        <ReactPaginate
-          pageCount={Math.ceil(totalPages)}
-          pageRange={2}
-          marginPagesDisplayed={2}
-          onPageChange={(e) => {
-            handleFetch(nextPageToken);
-          }}
-          containerClassName={"pagination_container"}
-          previousLinkClassName={"page"}
-          breakClassName={"page"}
-          nextLinkClassName={"page"}
-          pageClassName={"page"}
-          disabledClassNae={"disabled"}
-          activeClassName={"active"}
-        />
+      {completed ? (
+        <>
+          <PlaylistItems items={items} />
+          <ReactPaginate
+            pageCount={Math.ceil(totalPages)}
+            pageRange={2}
+            marginPagesDisplayed={2}
+            onPageChange={(e) => {
+              console.log(e);
+            }}
+            containerClassName={"pagination_container"}
+            previousLinkClassName={"page"}
+            breakClassName={"page"}
+            nextLinkClassName={"page"}
+            pageClassName={"page"}
+            disabledClassNae={"disabled"}
+            activeClassName={"active"}
+          />
+        </>
       ) : (
         <div>Nothing to show</div>
       )}
