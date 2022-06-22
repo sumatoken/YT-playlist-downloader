@@ -70,10 +70,15 @@ export default function Playlist() {
   };
 
   const handleSelectAll = () => {
+    let allSelected = [];
     items.map((pack, i) =>
-      pack.map((item, k) => selected.push(item.snippet.resourceId.videoId))
+      pack.map((item, k) => allSelected.push(item.snippet.resourceId.videoId))
     );
-    console.log(selected);
+    setSelected(allSelected);
+    setSelected((s) => {
+      console.log(selected);
+      return s;
+    });
   };
   return (
     <>
